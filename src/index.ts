@@ -9,6 +9,10 @@ const MAX_QUOTE_ASSETS = 5;
 
 let logger = winston.createLogger({
   level: 'info',
+  format: winston.format.combine(
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
   transports: [
     new winston.transports.Console(),
   ],
@@ -58,8 +62,8 @@ export const fetchDirectSpotExchangeRate = async (baseAsset: string, quoteAsset:
   const response = await fetchMarketData('us', `spot_direct_exchange_rate/${baseAsset}/${quoteAsset}/recent`, `interval=${interval}&limit=1`);
   return {
     quoteAsset,
-    volume: new Big(response.data[0].volume),
-    price: new Big(response.data[0].price)
+    volume: new Big(response.data[0] ? response.data[0].volume : 0),
+    price: new Big(response.data[0] ? response.data[0].price : 0)
   };
 };
 
@@ -73,7 +77,7 @@ export const fetchRate = async (baseAsset: string, quoteAsset: string, interval:
   ]);
   return {
     quoteAsset,
-    volume: baseQuote.volume,
+    volume: quoteUSD.volume.eq(0) ? quoteUSD.volume : baseQuote.volume,
     price: baseQuote.price.mul(quoteUSD.price)
   };
 };
