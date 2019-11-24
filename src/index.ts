@@ -9,6 +9,10 @@ const MAX_QUOTE_ASSETS = 5;
 
 let logger = winston.createLogger({
   level: 'info',
+  format: winston.format.combine(
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
   transports: [
     new winston.transports.Console(),
   ],
