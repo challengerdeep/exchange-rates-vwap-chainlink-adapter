@@ -7,6 +7,7 @@ const gcloud_logger_1 = require("./gcloud-logger");
 const MAX_QUOTE_ASSETS = 5;
 let logger = winston.createLogger({
     level: 'info',
+    format: winston.format.combine(winston.format.errors({ stack: true }), winston.format.json()),
     transports: [
         new winston.transports.Console(),
     ],
@@ -48,8 +49,8 @@ exports.fetchDirectSpotExchangeRate = async (baseAsset, quoteAsset, interval) =>
     const response = await exports.fetchMarketData('us', `spot_direct_exchange_rate/${baseAsset}/${quoteAsset}/recent`, `interval=${interval}&limit=1`);
     return {
         quoteAsset,
-        volume: new big_js_1.default(response.data[0].volume),
-        price: new big_js_1.default(response.data[0].price)
+        volume: new big_js_1.default(response.data[0] ? response.data[0].volume : 0),
+        price: new big_js_1.default(response.data[0] ? response.data[0].price : 0)
     };
 };
 exports.fetchRate = async (baseAsset, quoteAsset, interval) => {
@@ -62,7 +63,7 @@ exports.fetchRate = async (baseAsset, quoteAsset, interval) => {
     ]);
     return {
         quoteAsset,
-        volume: baseQuote.volume,
+        volume: quoteUSD.volume.eq(0) ? quoteUSD.volume : baseQuote.volume,
         price: baseQuote.price.mul(quoteUSD.price)
     };
 };
