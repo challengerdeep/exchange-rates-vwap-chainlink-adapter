@@ -97,8 +97,10 @@ exports.run = async (input) => {
     if (!/^[a-zA-Z0-9]{1,100}$/.test(process.env.API_KEY)) {
         logger.error(`Invalid or missing API_KEY ${process.env.API_KEY}`);
     }
-    const baseAsset = (input.data.coin || process.env.BASE_ASSET || 'ampl').toLowerCase();
-    const interval = input.data.interval || '5m';
+    const coin = input.data === undefined ? undefined : input.data.coin;
+    const inputInterval = input.data === undefined ? undefined : input.data.interval;
+    const baseAsset = (coin || process.env.BASE_ASSET || 'ampl').toLowerCase();
+    const interval = inputInterval || '5m';
     if (!/^[a-zA-Z0-9_]{1,50}$/.test(baseAsset)) {
         logger.error(`Invalid or missing BASE_ASSET ${baseAsset}`);
     }
